@@ -1,0 +1,275 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+
+/* matrix-editor svg {
+    width: 100%;
+} */
+
+matrix-renderer {
+    --overlay-1-color: white;
+    --overlay-1-opacity: 0.2;
+    --overlay-2-color: black;
+    --overlay-2-opacity: 0.5;
+    --guide-color: rgb(128, 125, 125);
+    --background: rgb(18, 18, 18);
+    --black-scrubber: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg id='Layer_1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46.27 98.23'%3E%3Cpath fill='black' d='M39.26,0H7.01C1.25,0-2.04,6.57,1.4,11.18l11.56,15.5c2.77,3.71,4.26,8.22,4.26,12.85v52.79c0,3.27,2.65,5.92,5.92,5.92h0c3.27,0,5.92-2.65,5.92-5.92v-52.79c0-4.63,1.49-9.13,4.26-12.85l11.56-15.5c3.44-4.62.15-11.18-5.61-11.18Z'/%3E%3C/svg%3E");
+    --white-scrubber: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg id='Layer_1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46.27 98.23'%3E%3Cpath fill='white' d='M39.26,0H7.01C1.25,0-2.04,6.57,1.4,11.18l11.56,15.5c2.77,3.71,4.26,8.22,4.26,12.85v52.79c0,3.27,2.65,5.92,5.92,5.92h0c3.27,0,5.92-2.65,5.92-5.92v-52.79c0-4.63,1.49-9.13,4.26-12.85l11.56-15.5c3.44-4.62.15-11.18-5.61-11.18Z'/%3E%3C/svg%3E");
+    --play-button:  url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg id='Layer_1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 55.47 68.1'%3E%3Cpath fill='white' d='M52.29,28.19L10.82,1.15C6.17-1.89,0,1.45,0,7.01v54.08c0,5.56,6.17,8.9,10.82,5.86l41.47-27.04c4.24-2.76,4.24-8.97,0-11.73Z'/%3E%3C/svg%3E");
+    --pause-button: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg id='Layer_1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38.94 66'%3E%3Crect fill='white' x='0' y='0' width='11.83' height='66' rx='5.92' ry='5.92'/%3E%3Crect fill='white' x='27.11' y='0' width='11.83' height='66' rx='5.92' ry='5.92'/%3E%3C/svg%3E");
+    /* --overlay-1-color: black;
+    --overlay-1-opacity: 0.1;
+    --overlay-2-color: white;
+    --overlay-2-opacity: 0.5;
+    --guide-color: rgb(128, 125, 125);
+    --pixel-hue: 25;
+    --background: rgb(232, 228, 228); */
+    
+    --pixel-stroke-color: none;
+    --pixel-stroke-width: 1;
+    --pixel-saturation: 1;
+    --pixel-hue: 10;
+    
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    position: relative;
+    background-color: var(--background);
+    
+}
+
+matrix-renderer[matrix] content-placer video {
+    opacity: 0;
+}
+matric-renderer:not([matrix]) .pixel {
+    opacity: 0;
+}
+
+matrix-renderer:not([matrix-ready]) .pixel-matrix {
+    opacity: 0;
+}
+
+content-placer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.pixel-matrix {
+    width: 84%;
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    z-index: 0;
+}
+
+
+.overlays .overlay:first-child {
+    fill: var(--overlay-1-color);
+    opacity: var(--overlay-1-opacity);
+}
+.overlays .overlay:nth-child(2) {
+    fill: var(--overlay-2-color);
+    opacity: var(--overlay-2-opacity);
+}
+
+
+content-place * {
+    pointer-events: none;
+}
+.bounding-box {
+    fill: none;
+    stroke: var(--guide-color);
+    transition: 0.5s ease-in-out opacity;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+.pixel .led {
+    --value-norm: calc(var(--value) / 255);
+    --light-offset: calc(0 * 50% * var(--pixel-saturation));
+    --light-range: calc(50% + 50% * (1 - var(--pixel-saturation)));
+    --lightness: calc(var(--light-offset) + var(--light-range) * var(--value-norm));
+    --pixel-sat: calc(var(--pixel-saturation) * 100%);
+    fill: hsl(var(--pixel-hue), var(--pixel-sat), var(--lightness));
+    stroke: var(--pixel-stroke-color);
+    stroke-width: var(--pixel-stroke-width);
+}
+.pixel[rgb] .led {
+    fill: var(--value);
+}
+
+content-placer:not([video]) .video-controls {
+    display: none;
+}
+.video-controls {
+    position: absolute;
+    bottom: 1em;
+    left: 1em;
+    right: 1em;
+    height: 2em;
+    display: flex
+}
+
+.pause-play[playing] {
+    background-image: var(--pause-button);
+    background-position: 50%;
+    background-size: 50%;
+
+}
+.pause-play {
+    background-image: var(--play-button);
+    width: 2em;
+    height: 2em;
+    background-color: transparent;
+    background-size: 60%;
+    background-repeat: no-repeat;
+    background-position: 60% 50%;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    pointer-events: all;;
+}
+.video-scrubber {
+    margin: 0.7em;
+    width: 100%; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: rgb(47, 46, 46);;
+    border-radius: 1em;
+
+    --progress: 0.1223
+}
+
+.video-scrubber-handle {
+    content: " ";
+    position: absolute;
+    height: 270%;
+    width: 2em;
+    bottom: -60%;
+    transform: translateX(-50%);
+    left: calc(var(--progress) * 100%);
+    border-radius: 1em;
+    background-image: var(--white-scrubber);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+}
+.video-scrubber::before {
+    content: " ";
+    position: absolute;
+    width: calc(var(--progress) * 100%);
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    border-radius: 1em;
+    background-color: rgb(179, 174, 174);
+}
+
+
+.tools {
+    position: absolute;
+    top: 0.3em;
+    left: 0.3em;
+    display: flex;
+    gap: 0.3em;
+    flex-direction: column;
+    z-index: 1000;
+    align-items: flex-start;
+}
+.controls {
+    display: flex;
+    font-size: 2em;
+    background-color: rgb(30, 30, 30);
+    border: 1px solid #484746;
+    border-radius: 0.5em;
+    color: #e3dcd0;
+    overflow: hidden;
+    align-items: center;
+}
+.controls[disabled] {
+    pointer-events: none;
+    opacity: 0.5;
+}
+.controls icon {
+    cursor: pointer;
+    padding: 0.3em;
+    transition: 0.2s ease-in-out background, 0.2s ease-in-out box-shadow, 0.2s ease-in-out color;
+}
+.controls icon:hover {
+    box-shadow: inset 0px 0px 11px #897a7584;
+    background: #191818;
+}
+.controls icon:active {
+    box-shadow: inset 0px 0px 11px #aaa09d96;
+    background: #2e2e2d;
+    color: white;
+}
+.controls > *:nth-child(n+2) {
+    border-left: 1px solid #484746;
+}
+.controls > *:first-child {
+    border-radius: 0.5em 0 0 0.5em;
+}
+.controls > *:last-child {
+    border-radius: 0 0.5em 0.5em 0;
+}
+
+.tools[rgb] .controls[cat] {
+    display: none;
+}
+
+.tools:not([minmax]) .controls[cat = "minmax"] {
+    display: none;
+}
+
+.tools:not([binary]) .controls[cat = "binary"] {
+    display: none;
+}
+
+.input {
+    display: flex;
+    flex-direction: column;  
+    justify-content: center;
+    height: 1.8em;
+    font-size: 0.9em;
+    padding: 0 0.3em;
+}
+.input label {
+    font-size: 0.4em;
+}
+.input input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e3dcd0;
+    font-size: 0.78em;
+    line-height: 0.7em;
+    text-align: left;
+    padding: 0em;
+}
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LVEdit</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="http://127.0.0.1:5500/Fonts/LittleIcons/LittleIcons.css">
+    <script type = "module" src = "./matrix-renderer.js"></script>
+</head>
+<body>
+    <matrix-renderer></matrix-renderer>
+    <div class = "tools" rgb>
+        <div class = "controls">
+            <icon video onclick = "MR.content.openVideo()"></icon>
+            <icon image onclick = "MR.content.openImage()"></icon>
+            <icon webcam onclick = "MR.content.startWebcam()"></icon>
+            <icon screenshare onclick = "MR.content.startShareScreen()"></icon>
+            <icon rgb onclick = "toggleRGB(this)"></icon>
+            
+            <div class = "input">
+                <label>width</label>
+                <input type = "number" min = "5" max = "150" step = "1" value = "30" onchange="MR.width = this.value;">
+            </div>
+            <div class = "input">
+                <label>height</label>
+                <input type = "number" min = "5" max = "150" step = "1" value = "40" onchange="MR.height = this.value;">
+            </div>
+            <div class = "input">
+                <label>padding</label>
+                <input type = "number" min = "0" max = "50" step = "1" value = "5" onchange="MR.pixelPadding = this.value;">
+            </div>
+            <div class = "input">
+                <label>radius</label>
+                <input type = "number" min = "0" max = "50" step = "1" value = "15" onchange="MR.pixelRadius = this.value;">
+            </div>
+            <icon file svg onclick = "MR.saveSVG()"></icon>
+        </div>
+        <div class = "controls" cat="gray">
+            <icon gray onclick = "toggleBinary(this)"></icon>
+            <icon invert onclick = "MR.grayScaleOptions.invert = !MR.grayScaleOptions.invert; this.toggleAttribute('on', MR.grayScaleOptions.invert)"></icon>
+            <icon norm onclick = "switchNormMode(this)"></icon>
+            <div class = "input">
+                <label>hue</label>
+                <input type = "number" min = "0" max = "360" step = "1" value = "10" onchange="MR.hue = this.value;">
+            </div>
+            <div class = "input">
+                <label>saturation</label>
+                <input type = "number" min = "0" max = "100" step = "1" value = "100" onchange="MR.saturation = parseFloat(this.value)/100;">
+            </div>
+        </div>
+        <div class = "controls" cat="minmax">
+            <div class = "input">
+                <label>min</label>
+                <input id = "n-min" type = "number" min = "0" max = "255" step = "1" value = "10" onchange="MR.grayScaleOptions.normalise_min = parseFloat(this.value);">
+            </div>
+            <div class = "input">
+                <label>max</label>
+                <input id = "n-max" type = "number" min = "0" max = "255" step = "1" value = "100" onchange="MR.grayScaleOptions.normalise_max = parseFloat(this.value);">
+            </div>
+        </div>
+        <div class = "controls" cat="binary">
+            <div class = "input">
+                <label>threshold</label>
+                <input type = "number" min = "0" max = "255" step = "1" value = "127" onchange="MR.grayScaleOptions.threshold = parseFloat(this.value);">
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    const tools = document.querySelector('.tools');
+    const nMax = document.getElementById('n-max');
+    const nMin = document.getElementById('n-min');
+    let normMode = 1;
+    function switchNormMode(el) {
+        normMode = (normMode + 1) % 3;
+        MR.grayScaleOptions.normalise = normMode != 0;
+        el.toggleAttribute('off', normMode == 0);
+        el.toggleAttribute('minmax', normMode == 2);
+        tools.toggleAttribute('minmax', normMode == 2);
+        if (normMode == 2) {
+            MR.grayScaleOptions.normalise_min = parseFloat(nMin.value);
+            MR.grayScaleOptions.normalise_max = parseFloat(nMax.value);
+        } else {
+             MR.grayScaleOptions.normalise_min = null;
+            MR.grayScaleOptions.normalise_max = null;
+        }        
+        
+    }
+    function toggleRGB(el) {
+        MR.isRGB = !MR.isRGB;
+        tools.toggleAttribute('rgb', MR.isRGB);
+        el.toggleAttribute('on', !MR.isRGB);
+    }
+
+    function toggleBinary(el) {
+        MR.grayScaleOptions.binary = !MR.grayScaleOptions.binary;
+        el.toggleAttribute('off', MR.grayScaleOptions.binary);
+        tools.toggleAttribute('binary', MR.grayScaleOptions.binary);
+    }
+</script>
+</html>
