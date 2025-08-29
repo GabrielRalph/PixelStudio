@@ -1,0 +1,163 @@
+@font-face {
+    font-family: "LittleIcons";
+    src: url("./LittleIcons.eot?5bfa3751466c35df9142c877c03b12ed#iefix") format("embedded-opentype"),
+url("./LittleIcons.woff2?5bfa3751466c35df9142c877c03b12ed") format("woff2"),
+url("./LittleIcons.woff?5bfa3751466c35df9142c877c03b12ed") format("woff");
+}
+
+icon {
+  font-family: LittleIcons !important;
+  font-style: normal;
+  font-weight: normal !important;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+  icon[webcam]::before {
+    content: "\f101";
+  }
+  icon[video]::before {
+    content: "\f102";
+  }
+  icon[settings]::before {
+    content: "\f103";
+  }
+  icon[screenshare]::before {
+    content: "\f104";
+  }
+  icon[rgb][on]::before {
+    content: "\f105";
+  }
+  icon[rgb]::before {
+    content: "\f106";
+  }
+  icon[record]::before {
+    content: "\f107";
+  }
+  icon[play]::before {
+    content: "\f108";
+  }
+  icon[pixel-studio]::before {
+    content: "\f109";
+  }
+  icon[photo]::before {
+    content: "\f10a";
+  }
+  icon[pause]::before {
+    content: "\f10b";
+  }
+  icon[norm][off]::before {
+    content: "\f10c";
+  }
+  icon[norm][minmax]::before {
+    content: "\f10d";
+  }
+  icon[norm]::before {
+    content: "\f10e";
+  }
+  icon[invert][on]::before {
+    content: "\f10f";
+  }
+  icon[invert]::before {
+    content: "\f110";
+  }
+  icon[image]::before {
+    content: "\f111";
+  }
+  icon[image-day]::before {
+    content: "\f112";
+  }
+  icon[gray][off]::before {
+    content: "\f113";
+  }
+  icon[gray20]::before {
+    content: "\f114";
+  }
+  icon[gray]::before {
+    content: "\f115";
+  }
+  icon[folder]::before {
+    content: "\f116";
+  }
+  icon[file][svg]::before {
+    content: "\f117";
+  }
+  icon[file][download]::before {
+    content: "\f118";
+  }
+  icon[file][bin]::before {
+    content: "\f119";
+  }
+  icon[file]::before {
+    content: "\f11a";
+  }
+  icon[low-webcam]::before {
+    content: "\f11b";
+  }
+  icon[low-video]::before {
+    content: "\f11c";
+  }
+  icon[low-settings]::before {
+    content: "\f11d";
+  }
+  icon[low-screenshare]::before {
+    content: "\f11e";
+  }
+  icon[low-record]::before {
+    content: "\f11f";
+  }
+  icon[low-play]::before {
+    content: "\f120";
+  }
+  icon[low-photo]::before {
+    content: "\f121";
+  }
+  icon[low-pause]::before {
+    content: "\f122";
+  }
+  icon[low-image]::before {
+    content: "\f123";
+  }
+  icon[low-image-day]::before {
+    content: "\f124";
+  }
+  icon[low-folder]::before {
+    content: "\f125";
+  }
+  icon[small-webcam]::before {
+    content: "\f126";
+  }
+  icon[small-video]::before {
+    content: "\f127";
+  }
+  icon[small-settings]::before {
+    content: "\f128";
+  }
+  icon[small-screenshare]::before {
+    content: "\f129";
+  }
+  icon[small-record]::before {
+    content: "\f12a";
+  }
+  icon[small-play]::before {
+    content: "\f12b";
+  }
+  icon[small-photo]::before {
+    content: "\f12c";
+  }
+  icon[small-pause]::before {
+    content: "\f12d";
+  }
+  icon[small-image]::before {
+    content: "\f12e";
+  }
+  icon[small-image-day]::before {
+    content: "\f12f";
+  }
+  icon[small-folder]::before {
+    content: "\f130";
+  }
+
