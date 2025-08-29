@@ -211,6 +211,7 @@ class ContentPlacer extends SvgPlus {
             this._updateForeignObject();
         } else {
             console.warn("Invalid size for video placer:", width, height);
+
         }
     }
 
@@ -223,7 +224,7 @@ class ContentPlacer extends SvgPlus {
             this.videoSize = videoSize;
             this._updateForeignObject();
         } else {
-            console.warn("Video not ready yet.");
+            // console.warn("Video not ready yet.");
         }
     }
 
