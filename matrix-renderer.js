@@ -195,9 +195,9 @@ class MatrixRenderer extends SvgPlus {
     async start(){
         while (true) {
             try {
-                let canvas = this.content.captureCanvas();
-                this.toggleAttribute("matrix-ready", !!canvas);
-                if (canvas) {
+                let imageData = this.content.captureCanvas();
+                this.toggleAttribute("matrix-ready", !!imageData);
+                if (imageData) {
                     const {innerSize, size} = this.content;
                     this.matrix.styles = {
                         width: innerSize.x + "px",
@@ -205,8 +205,6 @@ class MatrixRenderer extends SvgPlus {
                         top: (size.y - innerSize.y) / 2 + "px",
                         left: (size.x - innerSize.x) / 2 + "px"
                     }
-                    let imageData = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
-                    
                     if (this.isRGB) {
                         this.matrix.value = toRGB(imageData);
                     } else {

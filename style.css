@@ -45,6 +45,9 @@ matrix-renderer {
 matrix-renderer[matrix] content-placer video {
     opacity: 0;
 }
+matrix-renderer[matrix] content-placer img {
+    opacity: 0;
+}
 matric-renderer:not([matrix]) .pixel {
     opacity: 0;
 }
@@ -78,14 +81,21 @@ content-placer {
     fill: var(--overlay-1-color);
     opacity: var(--overlay-1-opacity);
 }
+
 .overlays .overlay:nth-child(2) {
     fill: var(--overlay-2-color);
     opacity: var(--overlay-2-opacity);
 }
 
-
+.contents {
+    display: contents;
+}
 content-place * {
     pointer-events: none;
+}
+content-placer svg {
+    width: 100%;
+    height: 100%;
 }
 .bounding-box {
     fill: none;
@@ -228,7 +238,9 @@ content-placer:not([video]) .video-controls {
 .controls > *:last-child {
     border-radius: 0 0.5em 0.5em 0;
 }
-
+.controls .contents > * {
+    border-left: 1px solid #484746;
+}
 .tools[rgb] .controls[cat] {
     display: none;
 }
@@ -272,4 +284,15 @@ input::-webkit-inner-spin-button {
 
 input[type=number] {
     -moz-appearance:textfield;
+}
+
+@media screen and (max-width: 550px) {
+    .phone-hide {
+        display: none;
+    }
+}
+@media screen and (min-width: 500px) {
+    .phone-only {
+        display: none;
+    }
 }

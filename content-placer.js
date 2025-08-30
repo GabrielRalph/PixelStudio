@@ -51,14 +51,24 @@ class ContentPlacer extends SvgPlus {
         this.video = this.fo.createChild("video", {
             width: "100%",
             height: "100%",
-            autoplay: true,
-            playsinline: true,
-            muted: true,
-            loop: true,
             events: {
                 canplaythrough: this._updateVideoSize.bind(this),
             }
         });
+        this.img = this.fo.createChild("img", {
+            width: "100%",
+            height: "100%",
+            styles: {
+                objectFit: "contain",
+                display: "none",
+            },
+        })
+
+        this.video.toggleAttribute("playsinline", true);
+        this.video.toggleAttribute("muted", true);
+        this.video.toggleAttribute("autoplay", true);
+        this.video.toggleAttribute("loop", true);
+
 
         this.videoControls = this.createChild("div", {class: "video-controls"});
         this.playPauseButton = this.videoControls.createChild("button", {class: "pause-play", events: {
@@ -91,6 +101,15 @@ class ContentPlacer extends SvgPlus {
             }
         }});
 
+
+        this.canvas1 = this.createChild("canvas", {style: { display: "none" }});
+        this.ctx1 = this.canvas1.getContext("2d", { willReadFrequently: true });
+        this.canvas2 = this.createChild("canvas", {style: { display: "none" }});    
+        this.ctx2 = this.canvas2.getContext("2d", { willReadFrequently: true });
+        this.canvas3 = this.createChild("canvas", {style: { display: "none" }});   
+        this.ctx3 = this.canvas3.getContext("2d", { willReadFrequently: true }); 
+
+        let lastTouches = [];
         this.events = {
             "mousedown": (e) => {
                 e.preventDefault();
@@ -128,10 +147,54 @@ class ContentPlacer extends SvgPlus {
                 y -= this.offsetTop;
 
                 this._zoomAtPoint(new Vector(x, y), -deltaY / this.zoomScale);
+            },
+            "touchmove": (e) => {
+                if (e.touches.length == 1) {
+                    if (lastTouches.length == 1) {
+                        const delta = new Vector(e.touches[0].clientX - lastTouches[0].clientX, e.touches[0].clientY - lastTouches[0].clientY);
+                        this._pan(delta);
+                    } else {
+                        lastTouches = [];
+                    }
+                } else if (e.touches.length == 2) {
+                    if (lastTouches.length == 2) {
+                        let lastCenter = new Vector((lastTouches[0].clientX + lastTouches[1].clientX) / 2, (lastTouches[0].clientY + lastTouches[1].clientY) / 2);
+                        let newCenter = new Vector((e.touches[0].clientX + e.touches[1].clientX) / 2, (e.touches[0].clientY + e.touches[1].clientY) / 2);
+                        let lastDist = new Vector(lastTouches[0].clientX - lastTouches[1].clientX, lastTouches[0].clientY - lastTouches[1].clientY).norm();
+                        let newDist = new Vector(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY).norm();
+                        let deltaScale = lastDist / newDist - 1;
+                        let delta = newCenter.sub(lastCenter);
+                        this._zoomAtPoint(lastCenter, -deltaScale);
+                        this._pan(delta);
+                    } else {
+                        lastTouches = [];
+                    }
+                }
+                lastTouches = [...e.touches];
+                e.preventDefault();
+            },
+            "touchend": (e) => {
+                lastTouches = [];
             }
         }
 
         this._updateScrubber();
+    }
+
+    set mode(value) {
+        if (value === "video") {
+            this.video.styles = { display: null };
+            this.img.styles = { display: "none" };
+            this._isVideoEl = true;
+        } else {
+            this.video.styles = { display: "none" };
+            this.img.styles = { display: null };
+            this._isVideoEl = false;
+
+        }
+    }
+    get captureElement() {
+        return this._isVideoEl ? this.video : this.img;
     }
 
     _dragScrubber(deltapx) {
@@ -343,10 +406,6 @@ class ContentPlacer extends SvgPlus {
             const offsetCentered = size.sub(scaledVideoSize).div(2);
             const distNow = offset.sub(offsetCentered);
 
-            // const cScaledVideoSize = this.videoSize.mul(this.scale);
-            // const cOffsetCentered = size.sub(cScaledVideoSize).div(2);
-            // const lastDist = this.offset.sub(cOffsetCentered);
-
             
             if (Math.abs(distNow.x) < snapThreshold) {
                 offset.x = offsetCentered.x;
@@ -370,30 +429,34 @@ class ContentPlacer extends SvgPlus {
     }
 
     openVideo(){
+        this.mode = "video";
         this.toggleAttribute("video", true);
-        let input = new SvgPlus("input");
-        input.props = {
+        let input = this.createChild("input", {
             type: "file",
             accept: "video/*",
             events: {
                 change: (e) => {
+                    console.log("File selected");
+                    
                     const file = e.target.files[0];
                     if (file) {
                         const url = URL.createObjectURL(file);
                         this.src = url;
+                        input.remove();
                     }
                 }
-            }
-        }
+            },
+            style: { display: "none" }
+        })
 
         input.click();
     }
 
     async openImage() {
+        this.mode = "image";
         this.toggleAttribute("video", false);
-        let input = new SvgPlus("input");
         let url = await new Promise((resolve) => {
-            input.props = {
+            let input = this.createChild("input", {
                 type: "file",
                 accept: "image/*",
                 events: {
@@ -401,16 +464,18 @@ class ContentPlacer extends SvgPlus {
                         const file = e.target.files[0];
                         if (file) {
                             const url = URL.createObjectURL(file);
+                            input.remove();
                             resolve(url);
                         }
                     }
-                }
-            }
+                },
+                style: { display: "none" }
+            });
             input.click();
         });
+        
         // Turn the image into a video
-        let img = new Image();
-        img.src = url;
+        const { img } = this;
         let loaded = await new Promise((resolve) => {
             img.onload = () => {
                 resolve(true);
@@ -418,22 +483,40 @@ class ContentPlacer extends SvgPlus {
             img.onerror = (e) => {
                 resolve(false);
             };
+            img.src = url;
         });
+
+        
         if (loaded) {
-            let canvas = new SvgPlus("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
-            let ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0);
-            let canvasStream = canvas.captureStream(1); // 30 FPS
-            this.isVideoLoaded = false;
-            this.video.srcObject = canvasStream;
+            this.videoSize = new Vector(img.naturalWidth, img.naturalHeight);
+            this._updateForeignObject();
+            // const {canvas3, ctx3} = this;
+            // canvas3.width = img.width;
+            // canvas3.height = img.height;
+            // console.log("img", img.width, img.height);
+            
+            // ctx3.drawImage(img, 0, 0, img.width, img.height);
+            // let sum = ctx3.getImageData(0, 0, img.width, img.height).data.reduce((a,b) => a+b, 0);
+            // console.log("sum", sum);
+            
+            // let canvasStream = canvas3.captureStream(10); // 30 FPS
+
+
+            // this.isVideoLoaded = false;
+            // this.video.srcObject = canvasStream;
+
+            // setTimeout(() => {
+            //     console.log("Image loaded into video element", this.isVideoLoaded);
+            //     this._updateVideoSize();
+            //     console.log("videoSize", this.video.videoWidth, this.video.videoHeight);
+            // }, 1000)
         } else {
             console.error("Failed to load image.");
         }
     }
 
     async startWebcam() {
+        this.mode = "video";
         this.toggleAttribute("video", false);
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             let stream = await navigator.mediaDevices.getUserMedia({ video: true })
@@ -445,6 +528,7 @@ class ContentPlacer extends SvgPlus {
     }
 
     async startShareScreen() {
+        this.mode = "video";
         this.toggleAttribute("video", false);
         if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
             let stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
@@ -456,27 +540,26 @@ class ContentPlacer extends SvgPlus {
     }
 
     captureCanvas(){
-        if (!this.isVideoLoaded) {
-            console.warn("Video not loaded yet.");
-            return null;
+        let imageData = null;
+        if (this.isVideoLoaded) {
+            
+            const { videoSize, innerSize, size, offset, scale, pixelHeight, pixelWidth, canvas1, canvas2, ctx1, ctx2 } = this;
+            canvas1.width = innerSize.x;
+            canvas1.height = innerSize.y;
+            let relOffset = offset.sub(size.sub(innerSize).div(2));
+
+            let scaledVideoSize = videoSize.mul(scale);
+            ctx1.drawImage(this.captureElement, 0, 0, videoSize.x, videoSize.y, relOffset.x, relOffset.y, scaledVideoSize.x, scaledVideoSize.y);
+            
+            
+            canvas2.width = pixelWidth;
+            canvas2.height = pixelHeight;
+            ctx2.drawImage(canvas1, 0, 0, pixelWidth, pixelHeight);
+
+            imageData = ctx2.getImageData(0, 0, pixelWidth, pixelHeight);
         }
-        let canvas = new SvgPlus("canvas");
-        const { videoSize, innerSize, size, offset, scale, pixelHeight, pixelWidth } = this;
-        canvas.width = innerSize.x;
-        canvas.height = innerSize.y;
-        let relOffset = offset.sub(size.sub(innerSize).div(2));
         
-        let scaledVideoSize = videoSize.mul(scale);
-        let ctx = canvas.getContext("2d");
-        ctx.drawImage(this.video, 0, 0, videoSize.x, videoSize.y, relOffset.x, relOffset.y, scaledVideoSize.x, scaledVideoSize.y);
-
-        let canvas2 = new SvgPlus("canvas");
-        canvas2.width = pixelWidth;
-        canvas2.height = pixelHeight;
-
-        let ctx2 = canvas2.getContext("2d");
-        ctx2.drawImage(canvas, 0, 0, innerSize.x, innerSize.y, 0, 0, pixelWidth, pixelHeight);
-        return canvas2;
+        return imageData;
     }
 
     set pixelSize(size) {
@@ -486,6 +569,7 @@ class ContentPlacer extends SvgPlus {
     }
 
     set src(string) {
+        
         this.isVideoLoaded = false;
         this.video.srcObject = null;
         this.video.props = {

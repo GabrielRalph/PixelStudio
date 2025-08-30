@@ -18,7 +18,28 @@
             <icon webcam onclick = "MR.content.startWebcam()"></icon>
             <icon screenshare onclick = "MR.content.startShareScreen()"></icon>
             <icon rgb onclick = "toggleRGB(this)"></icon>
+            <div class = "contents phone-hide">
+                <div class = "input">
+                <label>width</label>
+                <input type = "number" min = "5" max = "150" step = "1" value = "30" onchange="MR.width = this.value;">
+                </div>
+                <div class = "input">
+                    <label>height</label>
+                    <input type = "number" min = "5" max = "150" step = "1" value = "40" onchange="MR.height = this.value;">
+                </div>
+                <div class = "input">
+                    <label>padding</label>
+                    <input type = "number" min = "0" max = "50" step = "1" value = "5" onchange="MR.pixelPadding = this.value;">
+                </div>
+                <div class = "input">
+                    <label>radius</label>
+                    <input type = "number" min = "0" max = "50" step = "1" value = "15" onchange="MR.pixelRadius = this.value;">
+                </div>
+                <icon file svg onclick = "MR.saveSVG()"></icon>
+            </div>
             
+        </div>
+        <div class = "controls phone-only">
             <div class = "input">
                 <label>width</label>
                 <input type = "number" min = "5" max = "150" step = "1" value = "30" onchange="MR.width = this.value;">
